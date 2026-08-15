@@ -50,3 +50,46 @@ class RecommendationEngine:
         return list(set(recommendations)) # Deduplicate
 
 recommendation_engine = RecommendationEngine()
+
+async def get_personalized_recommendations(db: AsyncSession, user_id: str):
+    from ..models.personalization import RevisionSchedule
+    
+    recommendations = []
+    
+    # 1. Check Due Revisions
+    rev_query = select(RevisionSchedule).where(
+        RevisionSchedule.user_id == user_id,
+        RevisionSchedule.status == "DUE"
+    )
+    due_revisions = (await db.execute(rev_query)).scalars().all()
+    
+    topics = (await db.execute(select(Topic))).scalars().all()
+    topic_map = {t.id: t.name for t in topics}
+
+    for rev in due_revisions:
+        topic_name = topic_map.get(rev.topic_id, rev.topic_id)
+        recommendations.append({
+            "type": "REVISION",
+            "topic": topic_name,
+            "priority": "HIGH",
+            "reason": f"Topic {topic_name} is due for review.",
+            "action": f"Complete a revision quiz for {topic_name}."
+        })
+
+    # 2. Check Weak Topics
+    weak_query = select(TopicMastery).where(
+        TopicMastery.user_id == user_id,
+        TopicMastery.accuracy < 60.0
+    )
+    weak_topics = (await db.execute(weak_query)).scalars().all()
+    for weak in weak_topics:
+        topic_name = topic_map.get(weak.topic_id, weak.topic_id)
+        recommendations.append({
+            "type": "PRACTICE",
+            "topic": topic_name,
+            "priority": "HIGH",
+            "reason": f"Your accuracy in {topic_name} is {weak.accuracy}%.",
+            "action": f"Practice {topic_name} to improve your mastery."
+        })
+        
+    return recommendations

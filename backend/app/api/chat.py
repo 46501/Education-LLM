@@ -4,6 +4,7 @@ from sqlalchemy.future import select
 from fastapi.responses import StreamingResponse
 import json
 from litellm import acompletion
+from ..models.personalization import LearningPreference, LearningMemory
 
 from ..core.database import get_db
 from ..core.config import settings
@@ -63,10 +64,41 @@ async def chat(request: MessageCreate, current_user: User = Depends(get_current_
     except Exception as e:
         print(f"RAG retrieval failed: {e}")
 
+    # Inject Personalization Context
+    try:
+        pref_res = await db.execute(select(LearningPreference).where(LearningPreference.user_id == current_user.id))
+        pref = pref_res.scalar_one_or_none()
+        
+        mem_res = await db.execute(select(LearningMemory).where(LearningMemory.user_id == current_user.id).order_by(LearningMemory.created_at.desc()).limit(3))
+        mems = mem_res.scalars().all()
+        
+        pers_context = "\n\n--- STUDENT PROFILE ---\n"
+        if pref:
+            pers_context += f"Explanation Style: {pref.explanation_style}\n"
+            pers_context += f"Difficulty Preference: {pref.difficulty_preference}\n"
+        
+        if mems:
+            pers_context += "Learning Memories (Things to remember about this student):\n"
+            for m in mems:
+                pers_context += f"- [{m.memory_type}] {m.content}\n"
+                
+        messages[0]["content"] += pers_context
+    except Exception as e:
+        print(f"Personalization retrieval failed: {e}")
+
     for msg in history:
         messages.append({"role": msg.role, "content": msg.content})
 
     async def generate():
+        if settings.LLM_API_KEY == "your_openai_api_key_here":
+            dummy_resp = "This is a mocked AI Tutor response. Context injected successfully."
+            yield f"data: {json.dumps({'content': dummy_resp})}\n\n"
+            
+            ai_message = Message(conversation_id=conversation.id, role="tutor", content=dummy_resp)
+            db.add(ai_message)
+            await db.commit()
+            return
+
         response = await acompletion(
             model="gemini/gemini-1.5-pro", # Defaulting to gemini or openai based on settings
             messages=messages,

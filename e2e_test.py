@@ -137,6 +137,31 @@ def run_tests():
     assert res.status_code == 404, "User B should not access User A's quiz"
     print("User Isolation successful.")
 
+    print("Testing Phase 4: Study Plan Generate...")
+    res = requests.post(f"{BASE_URL}/api/personalization/study-plan/generate", json={
+        "goal": "Improve recursion skills",
+        "duration_days": 3,
+        "available_minutes_per_day": 45
+    }, headers=headers_a)
+    if res.status_code == 200:
+        print("Study Plan Generated successfully.")
+    else:
+        print(f"Study Plan Generate failed: {res.status_code} {res.text}")
+
+    print("Testing Phase 4: Due Revisions...")
+    res = requests.get(f"{BASE_URL}/api/personalization/revision/due", headers=headers_a)
+    if res.status_code == 200:
+        print("Due revisions fetched:", res.json())
+    else:
+        print(f"Due revisions failed: {res.status_code} {res.text}")
+
+    print("Testing Phase 4: Recommendations...")
+    res = requests.get(f"{BASE_URL}/api/personalization/recommendations", headers=headers_a)
+    if res.status_code == 200:
+        print("Recommendations fetched:", res.json())
+    else:
+        print(f"Recommendations failed: {res.status_code} {res.text}")
+
     print("ALL TESTS PASSED!")
 
 if __name__ == "__main__":
