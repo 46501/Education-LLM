@@ -88,13 +88,39 @@ export default function Chat() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <div className="w-64 bg-gray-900 text-white p-4 hidden md:block">
+      <div className="w-64 bg-gray-900 text-white p-4 hidden md:block flex flex-col">
         <h2 className="text-xl font-bold mb-4">Education LLM</h2>
-        <nav className="space-y-2">
+        <nav className="space-y-2 flex-1">
           <a href="#" className="block py-2 px-4 bg-gray-800 rounded">AI Tutor</a>
-          <a href="#" className="block py-2 px-4 hover:bg-gray-800 rounded">Study Material</a>
           <a href="#" className="block py-2 px-4 hover:bg-gray-800 rounded">Quizzes</a>
         </nav>
+        <div className="mt-8 border-t border-gray-700 pt-4">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase mb-2">Study Material</h3>
+          <input 
+            type="file" 
+            className="w-full text-sm text-gray-300 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600 cursor-pointer"
+            onChange={async (e) => {
+              if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                const token = localStorage.getItem("token");
+                const formData = new FormData();
+                formData.append("file", file);
+                try {
+                  alert("Uploading...");
+                  const res = await fetch("http://localhost:8000/api/documents/upload", {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData
+                  });
+                  if (res.ok) alert("Uploaded successfully. AI can now reference it!");
+                  else alert("Failed to upload document.");
+                } catch (err) {
+                  alert("Upload error.");
+                }
+              }
+            }}
+          />
+        </div>
       </div>
       
       <div className="flex-1 flex flex-col">

@@ -48,6 +48,21 @@ async def chat(request: MessageCreate, current_user: User = Depends(get_current_
     history = result.scalars().all()
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    
+    # Retrieve context from RAG
+    try:
+        from ..services.rag import rag_service
+        context = await rag_service.retrieve_context(db, current_user.id, request.content)
+        if context:
+            context_str = "Use the following context to answer the student's question. Always cite the source filename and page number.\n\n"
+            for c in context:
+                context_str += f"Source: [{c['filename']}, Page {c['page_number']}]\nText: \"\"\"{c['content']}\"\"\"\n\n"
+            
+            # Inject context into system prompt
+            messages[0]["content"] += "\n" + context_str
+    except Exception as e:
+        print(f"RAG retrieval failed: {e}")
+
     for msg in history:
         messages.append({"role": msg.role, "content": msg.content})
 

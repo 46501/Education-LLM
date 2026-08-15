@@ -9,3 +9,9 @@ litellm
 python-dotenv
 pydantic
 pydantic-settings
+pgvector
+pymupdf
+python-docx
+python-multipart
+langchain-text-splitters
+aiosqlite
