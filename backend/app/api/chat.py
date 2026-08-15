@@ -1,0 +1,73 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from fastapi.responses import StreamingResponse
+import json
+from litellm import acompletion
+
+from ..core.database import get_db
+from ..core.config import settings
+from ..models.user import User
+from ..models.chat import Conversation, Message
+from ..schemas.chat import MessageCreate, MessageResponse, ConversationResponse
+from .deps import get_current_user
+
+router = APIRouter()
+
+SYSTEM_PROMPT = """You are an expert AI Tutor. Your goal is to guide the student towards the answer rather than just giving it away.
+Use the Socratic method when appropriate.
+Keep your responses educational and encouraging.
+"""
+
+@router.get("/", response_model=list[ConversationResponse])
+async def get_conversations(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Conversation).where(Conversation.user_id == current_user.id))
+    conversations = result.scalars().all()
+    return conversations
+
+@router.post("/")
+async def chat(request: MessageCreate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    if request.conversation_id:
+        result = await db.execute(select(Conversation).where(Conversation.id == request.conversation_id, Conversation.user_id == current_user.id))
+        conversation = result.scalars().first()
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+    else:
+        conversation = Conversation(user_id=current_user.id, title=request.content[:50])
+        db.add(conversation)
+        await db.commit()
+        await db.refresh(conversation)
+
+    # Save user message
+    user_message = Message(conversation_id=conversation.id, role="user", content=request.content)
+    db.add(user_message)
+    await db.commit()
+
+    # Get history
+    result = await db.execute(select(Message).where(Message.conversation_id == conversation.id).order_by(Message.created_at))
+    history = result.scalars().all()
+
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    for msg in history:
+        messages.append({"role": msg.role, "content": msg.content})
+
+    async def generate():
+        response = await acompletion(
+            model="gemini/gemini-1.5-pro", # Defaulting to gemini or openai based on settings
+            messages=messages,
+            api_key=settings.LLM_API_KEY or "dummy_key", # Assuming litellm will handle or we mock
+            stream=True
+        )
+        full_reply = ""
+        async for chunk in response:
+            if chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                full_reply += content
+                yield f"data: {json.dumps({'content': content})}\n\n"
+        
+        # Save AI reply
+        ai_message = Message(conversation_id=conversation.id, role="tutor", content=full_reply)
+        db.add(ai_message)
+        await db.commit()
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
