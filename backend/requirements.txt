@@ -4,6 +4,7 @@ sqlalchemy[asyncio]
 asyncpg
 alembic
 passlib[bcrypt]
+bcrypt==3.2.2
 pyjwt
 litellm
 python-dotenv
