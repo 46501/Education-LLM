@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #f8fafc; /* slate-50 */
@@ -25,6 +26,33 @@
 
   --error: #ef4444; /* red-500 */
   --error-bg: #fee2e2; /* red-100 */
+}
+
+.dark {
+  --background: #020617; /* slate-950 */
+  --foreground: #f8fafc; /* slate-50 */
+  
+  --primary: #6366f1; /* indigo-500 */
+  --primary-hover: #4f46e5; /* indigo-600 */
+  --primary-light: #3730a3; /* indigo-800 */
+
+  --surface: #0f172a; /* slate-900 */
+  --surface-hover: #1e293b; /* slate-800 */
+  
+  --border: #334155; /* slate-700 */
+  --ring: #4338ca; /* indigo-700 */
+
+  --muted: #94a3b8; /* slate-400 */
+  --muted-bg: #1e293b; /* slate-800 */
+
+  --success: #34d399; /* emerald-400 */
+  --success-bg: #064e3b; /* emerald-900 */
+
+  --warning: #fbbf24; /* amber-400 */
+  --warning-bg: #78350f; /* amber-900 */
+
+  --error: #f87171; /* red-400 */
+  --error-bg: #7f1d1d; /* red-900 */
 }
 
 @theme inline {

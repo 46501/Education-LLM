@@ -229,10 +229,16 @@ async def submit_quiz(quiz_id: str, req: SubmitQuizRequest, current_user: User =
 
         # Update streak — quiz completion is a meaningful learning activity
         await update_streak(db, current_user.id)
+        
+        # --- Gamification ---
+        from ..services.gamification import award_xp
+        xp_gained = len(quiz.questions) * 10
+        gamification_result = await award_xp(db, current_user.id, xp_gained)
+
     except Exception as e:
         logger.error(f"Phase 4 post-quiz integration error (non-fatal): {e}")
 
-    return {"message": "Quiz evaluated and submitted successfully."}
+    return {"message": "Quiz evaluated and submitted successfully.", "gamification": gamification_result if 'gamification_result' in locals() else None}
 
 @router.get("/{quiz_id}/results")
 async def get_quiz_results(quiz_id: str, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):

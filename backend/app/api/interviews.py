@@ -91,6 +91,18 @@ async def complete_interview(
 ):
     try:
         session = await interview_engine.complete_interview(db, session_id, current_user.id)
-        return {"message": "Interview completed", "score": session.score, "feedback": session.feedback}
+        
+        # --- Gamification ---
+        from ..services.gamification import award_xp
+        # Base XP for completing an interview, plus bonus based on score
+        xp_gained = 50 + int((session.score or 0) / 2)
+        gamification_result = await award_xp(db, current_user.id, xp_gained)
+        
+        return {
+            "message": "Interview completed", 
+            "score": session.score, 
+            "feedback": session.feedback,
+            "gamification": gamification_result
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

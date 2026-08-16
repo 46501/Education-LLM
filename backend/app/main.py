@@ -9,6 +9,7 @@ from .api.practice import router as practice_router
 from .api.personalization import router as personalization_router
 from .api.exams import router as exams_router
 from .api.interviews import router as interviews_router
+from .api.flashcards import router as flashcards_router
 
 app = FastAPI(
     title="Education LLM Platform",
@@ -35,6 +36,7 @@ app.include_router(practice_router, prefix="/api/practice", tags=["practice"])
 app.include_router(personalization_router, prefix="/api/personalization", tags=["personalization"])
 app.include_router(exams_router, prefix="/api/exams", tags=["exams"])
 app.include_router(interviews_router, prefix="/api/interviews", tags=["interviews"])
+app.include_router(flashcards_router, prefix="/api/flashcards", tags=["flashcards"])
 
 @app.get("/health")
 async def health_check():

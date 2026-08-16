@@ -24,22 +24,102 @@ function InterviewSessionContent() {
   const [isTyping, setIsTyping] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [finalScore, setFinalScore] = useState<number | null>(null);
+  const [isListening, setIsListening] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  const speakText = (text: string) => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel(); // Stop any ongoing speech
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   useEffect(() => {
-    // Ideally we'd fetch existing session messages here on mount
-    // For now we assume a fresh session and rely on the start endpoint response
-    setMessages([{ role: "interviewer", content: "Hello! I will be your interviewer today. Are you ready to begin?" }]);
+    const initialMsg = "Hello! I will be your interviewer today. Are you ready to begin?";
+    setMessages([{ role: "interviewer", content: initialMsg }]);
+    // We delay speech slightly to ensure component mounts
+    setTimeout(() => speakText(initialMsg), 500);
   }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+
+        recognitionRef.current.onresult = (event: any) => {
+          let currentTranscript = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              setInput((prev) => prev + transcript + " ");
+            } else {
+              currentTranscript += transcript;
+            }
+          }
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          setIsListening(false);
+        };
+        
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+    return () => {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      if (!recognitionRef.current) {
+        alert("Speech recognition is not supported in this browser.");
+        return;
+      }
+      try {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+          window.speechSynthesis.cancel(); // Stop AI speaking if user starts talking
+        }
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isTyping || isCompleted) return;
+
+    if (isListening) {
+      toggleListening();
+    }
+
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
 
     const token = localStorage.getItem("token");
     const userMsg = input.trim();
@@ -61,15 +141,14 @@ function InterviewSessionContent() {
       if (res.ok) {
         const data = await res.json();
         
-        // Update user message with evaluation context
         setMessages(prev => {
           const newMsgs = [...prev];
           newMsgs[newMsgs.length - 1].evaluation = data.evaluation;
           return newMsgs;
         });
 
-        // Add interviewer next question
         setMessages(prev => [...prev, { role: "interviewer", content: data.next_question }]);
+        speakText(data.next_question);
       }
     } catch (err) {
       console.error(err);
@@ -183,17 +262,34 @@ function InterviewSessionContent() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Speak your answer..."
+                placeholder={isListening ? "Listening..." : "Speak your answer..."}
                 disabled={isTyping}
-                className="w-full pl-5 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-70"
+                className="w-full pl-5 pr-24 py-4 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-70"
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isTyping}
-                className="absolute right-2 p-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition disabled:opacity-50 disabled:hover:bg-purple-600"
-              >
-                <Send size={20} className={isTyping ? "opacity-0" : ""} />
-              </button>
+              <div className="absolute right-2 flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  className={`p-2.5 rounded-full transition-colors ${
+                    isListening 
+                      ? "bg-red-100 text-red-600 hover:bg-red-200" 
+                      : "text-gray-400 hover:bg-gray-200"
+                  }`}
+                >
+                  {isListening ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                  )}
+                </button>
+                <button
+                  type="submit"
+                  disabled={(!input.trim() && !isListening) || isTyping}
+                  className="p-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition disabled:opacity-50 disabled:hover:bg-purple-600"
+                >
+                  <Send size={20} className={isTyping ? "opacity-0" : ""} />
+                </button>
+              </div>
             </form>
           </div>
         </div>

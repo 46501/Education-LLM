@@ -6,3 +6,4 @@ from .learning import Subject, Topic, Question, Quiz, QuizQuestion, QuestionAtte
 from .personalization import LearningProfile, LearningPreference, LearningMemory, StudyPlan, StudyPlanItem, RevisionSchedule, TopicPrerequisite, StudySession
 from .exam import Exam, ExamTopic, ExamQuestion, ExamSession
 from .interview import Interview, InterviewSession, InterviewMessage
+from .flashcard import FlashcardDeck, Flashcard

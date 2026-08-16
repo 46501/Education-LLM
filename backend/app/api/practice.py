@@ -125,6 +125,12 @@ async def answer_practice(req: PracticeAnswerRequest, current_user: User = Depen
 
         # Practice answer is a meaningful learning activity
         await update_streak(db, current_user.id)
+        
+        # --- Gamification ---
+        from ..services.gamification import award_xp
+        xp_gained = 5 if eval_res["is_correct"] else 1
+        gamification_result = await award_xp(db, current_user.id, xp_gained)
+        
     except Exception as e:
         logger.error(f"Phase 4 post-practice integration error (non-fatal): {e}")
 
@@ -132,5 +138,6 @@ async def answer_practice(req: PracticeAnswerRequest, current_user: User = Depen
         "is_correct": eval_res["is_correct"],
         "correct_answer": q.correct_answer,
         "explanation": q.explanation,
-        "new_recommended_difficulty": mastery.current_difficulty
+        "new_recommended_difficulty": mastery.current_difficulty,
+        "gamification": gamification_result if 'gamification_result' in locals() else None
     }
