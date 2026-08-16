@@ -4,6 +4,9 @@ from sqlalchemy.future import select
 from fastapi.responses import StreamingResponse
 import json
 from litellm import acompletion
+import logging
+
+logger = logging.getLogger(__name__)
 from ..models.personalization import LearningPreference, LearningMemory
 
 from ..core.database import get_db
@@ -62,7 +65,7 @@ async def chat(request: MessageCreate, current_user: User = Depends(get_current_
             # Inject context into system prompt
             messages[0]["content"] += "\n" + context_str
     except Exception as e:
-        print(f"RAG retrieval failed: {e}")
+        logger.error(f"RAG retrieval failed: {e}")
 
     # Inject Personalization Context
     try:
@@ -84,7 +87,7 @@ async def chat(request: MessageCreate, current_user: User = Depends(get_current_
                 
         messages[0]["content"] += pers_context
     except Exception as e:
-        print(f"Personalization retrieval failed: {e}")
+        logger.error(f"Personalization retrieval failed: {e}")
 
     for msg in history:
         messages.append({"role": msg.role, "content": msg.content})

@@ -3,7 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from pydantic import BaseModel
 import uuid
+import logging
 
+logger = logging.getLogger(__name__)
 from ..core.database import get_db
 from ..models.user import User
 from ..models.learning import Subject, Topic, Question, QuestionAttempt
@@ -124,7 +126,7 @@ async def answer_practice(req: PracticeAnswerRequest, current_user: User = Depen
         # Practice answer is a meaningful learning activity
         await update_streak(db, current_user.id)
     except Exception as e:
-        print(f"Phase 4 post-practice integration error (non-fatal): {e}")
+        logger.error(f"Phase 4 post-practice integration error (non-fatal): {e}")
 
     return {
         "is_correct": eval_res["is_correct"],

@@ -9,6 +9,9 @@ from ..core.database import get_db
 from ..models.user import User
 from ..models.learning import Quiz, QuizQuestion, Question, QuestionAttempt, Subject, Topic
 from ..services.quiz_generator import quiz_generator
+import logging
+
+logger = logging.getLogger(__name__)
 from ..services.evaluator import answer_evaluator
 from ..services.scoring import scoring_engine
 from .deps import get_current_user
@@ -227,7 +230,7 @@ async def submit_quiz(quiz_id: str, req: SubmitQuizRequest, current_user: User =
         # Update streak — quiz completion is a meaningful learning activity
         await update_streak(db, current_user.id)
     except Exception as e:
-        print(f"Phase 4 post-quiz integration error (non-fatal): {e}")
+        logger.error(f"Phase 4 post-quiz integration error (non-fatal): {e}")
 
     return {"message": "Quiz evaluated and submitted successfully."}
 

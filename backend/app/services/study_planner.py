@@ -7,7 +7,9 @@ import litellm
 from ..core.config import settings
 import json
 from datetime import datetime, timedelta, timezone
+import logging
 
+logger = logging.getLogger(__name__)
 
 async def generate_study_plan_context(db: AsyncSession, user_id: str) -> dict:
     """Collect student context for study plan generation."""
@@ -130,7 +132,7 @@ async def generate_study_plan_with_llm(
         content = response.choices[0].message.content
         return json.loads(content)
     except Exception as e:
-        print(f"LLM Error generating study plan: {e}")
+        logger.error(f"LLM Error generating study plan: {e}")
         # Fall back to deterministic plan
         return _generate_fallback_plan(context, goal, duration_days, available_minutes)
 
