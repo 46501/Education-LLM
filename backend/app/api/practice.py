@@ -110,6 +110,22 @@ async def answer_practice(req: PracticeAnswerRequest, current_user: User = Depen
 
     await db.commit()
 
+    # --- Phase 4 Personalization Integration ---
+    try:
+        from ..services.spaced_repetition import update_revision_schedule
+        from ..services.learning_memory import evaluate_and_store_memory
+        from ..services.streak import update_streak
+
+        # Use the single question's accuracy (100 or 0)
+        accuracy = 100.0 if eval_res["is_correct"] else 0.0
+        await update_revision_schedule(db, current_user.id, q.topic_id, accuracy)
+        await evaluate_and_store_memory(db, current_user.id, q.topic_id)
+
+        # Practice answer is a meaningful learning activity
+        await update_streak(db, current_user.id)
+    except Exception as e:
+        print(f"Phase 4 post-practice integration error (non-fatal): {e}")
+
     return {
         "is_correct": eval_res["is_correct"],
         "correct_answer": q.correct_answer,

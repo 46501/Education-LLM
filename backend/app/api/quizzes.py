@@ -191,6 +191,44 @@ async def submit_quiz(quiz_id: str, req: SubmitQuizRequest, current_user: User =
     quiz.completed_at = datetime.datetime.utcnow()
     await db.commit()
 
+    # --- Phase 4 Personalization Integration ---
+    try:
+        from ..services.spaced_repetition import update_revision_schedule
+        from ..services.learning_memory import evaluate_and_store_memory
+        from ..services.streak import update_streak
+
+        # Collect per-topic accuracy from this quiz
+        topic_results: dict[str, dict] = {}
+        for qq in quiz.questions:
+            q = qq.question
+            attempt_answer = answer_map.get(q.id)
+            if not attempt_answer:
+                continue
+            if q.topic_id not in topic_results:
+                topic_results[q.topic_id] = {"correct": 0, "total": 0}
+            topic_results[q.topic_id]["total"] += 1
+            # Re-check correctness from the attempt we already stored
+            result_check = await db.execute(
+                select(QuestionAttempt).where(
+                    QuestionAttempt.quiz_id == quiz.id,
+                    QuestionAttempt.question_id == q.id,
+                    QuestionAttempt.user_id == current_user.id
+                )
+            )
+            attempt_record = result_check.scalars().first()
+            if attempt_record and attempt_record.is_correct:
+                topic_results[q.topic_id]["correct"] += 1
+
+        for tid, stats in topic_results.items():
+            accuracy = (stats["correct"] / stats["total"]) * 100 if stats["total"] > 0 else 0
+            await update_revision_schedule(db, current_user.id, tid, accuracy)
+            await evaluate_and_store_memory(db, current_user.id, tid)
+
+        # Update streak — quiz completion is a meaningful learning activity
+        await update_streak(db, current_user.id)
+    except Exception as e:
+        print(f"Phase 4 post-quiz integration error (non-fatal): {e}")
+
     return {"message": "Quiz evaluated and submitted successfully."}
 
 @router.get("/{quiz_id}/results")

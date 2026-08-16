@@ -10,6 +10,9 @@ class RAGService:
         self.embedding_model = "text-embedding-3-small"
 
     async def generate_embedding(self, content: str) -> list[float]:
+        if not settings.LLM_API_KEY or settings.LLM_API_KEY == "your_openai_api_key_here":
+            return [0.1] * 1536
+            
         response = await aembedding(
             model=self.embedding_model,
             input=content,

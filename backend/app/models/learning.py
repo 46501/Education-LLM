@@ -89,6 +89,8 @@ class TopicMastery(Base):
     current_difficulty = Column(String, default="BEGINNER")
     last_practiced = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
+    topic = relationship("Topic")
+
 class Mistake(Base):
     __tablename__ = "mistakes"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -99,3 +101,6 @@ class Mistake(Base):
     student_answer = Column(JSONB, nullable=True)
     explanation = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    topic = relationship("Topic")
+    question = relationship("Question")

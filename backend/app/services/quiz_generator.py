@@ -29,6 +29,26 @@ class QuizGenerator:
             context=context
         )
 
+        if not settings.LLM_API_KEY or settings.LLM_API_KEY == "your_openai_api_key_here":
+            return QuizGenerationResponse(
+                questions=[
+                    {
+                        "question_text": f"What is a mock question for {topic}?",
+                        "options": ["A", "B", "C", "D"],
+                        "correct_answer": "A",
+                        "explanation": "This is a mocked explanation.",
+                        "difficulty": difficulty
+                    },
+                    {
+                        "question_text": f"Another mock question for {topic}?",
+                        "options": ["True", "False", "Neither", "Both"],
+                        "correct_answer": "True",
+                        "explanation": "This is a mocked explanation.",
+                        "difficulty": difficulty
+                    }
+                ]
+            )
+
         try:
             response = await acompletion(
                 model=self.model,

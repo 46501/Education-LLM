@@ -90,7 +90,7 @@ async def chat(request: MessageCreate, current_user: User = Depends(get_current_
         messages.append({"role": msg.role, "content": msg.content})
 
     async def generate():
-        if settings.LLM_API_KEY == "your_openai_api_key_here":
+        if not settings.LLM_API_KEY or settings.LLM_API_KEY == "your_openai_api_key_here":
             dummy_resp = "This is a mocked AI Tutor response. Context injected successfully."
             yield f"data: {json.dumps({'content': dummy_resp})}\n\n"
             
