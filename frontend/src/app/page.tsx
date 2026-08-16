@@ -21,7 +21,7 @@ export default function Home() {
       if (res.ok) {
         if (isLogin) {
           localStorage.setItem("token", data.access_token);
-          router.push("/chat");
+          router.push("/dashboard");
         } else {
           setIsLogin(true);
         }
