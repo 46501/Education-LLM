@@ -63,7 +63,8 @@ class QuestionAttempt(Base):
     __tablename__ = "question_attempts"
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
-    quiz_id = Column(String, ForeignKey("quizzes.id"), nullable=True) # Null for practice mode
+    quiz_id = Column(String, ForeignKey("quizzes.id"), nullable=True) # Null for practice/exam mode
+    exam_id = Column(String, ForeignKey("exams.id"), nullable=True) # Null for practice/quiz mode
     question_id = Column(String, ForeignKey("questions.id"), nullable=False)
     submitted_answer = Column(JSONB, nullable=True)
     is_correct = Column(Boolean, nullable=False, default=False)

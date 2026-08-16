@@ -91,8 +91,12 @@ export default function Chat() {
       <div className="w-64 bg-gray-900 text-white p-4 hidden md:block flex flex-col">
         <h2 className="text-xl font-bold mb-4">Education LLM</h2>
         <nav className="space-y-2 flex-1">
-          <a href="#" className="block py-2 px-4 bg-gray-800 rounded">AI Tutor</a>
-          <a href="#" className="block py-2 px-4 hover:bg-gray-800 rounded">Quizzes</a>
+          <a href="/chat" className="block py-2 px-4 bg-gray-800 rounded">AI Tutor</a>
+          <a href="/quizzes" className="block py-2 px-4 hover:bg-gray-800 rounded">Quizzes</a>
+          <a href="/practice" className="block py-2 px-4 hover:bg-gray-800 rounded">Practice</a>
+          <a href="/progress" className="block py-2 px-4 hover:bg-gray-800 rounded">Progress</a>
+          <a href="/exams" className="block py-2 px-4 hover:bg-gray-800 rounded text-blue-300">Exams</a>
+          <a href="/interview/setup" className="block py-2 px-4 hover:bg-gray-800 rounded text-purple-300">Interviews</a>
         </nav>
         <div className="mt-8 border-t border-gray-700 pt-4">
           <h3 className="text-sm font-semibold text-gray-400 uppercase mb-2">Study Material</h3>
