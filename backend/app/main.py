@@ -27,11 +27,21 @@ app = FastAPI(
 
 logger = logging.getLogger("uvicorn.error")
 
+def get_cors_headers(request: Request) -> dict:
+    origin = request.headers.get("origin")
+    if origin:
+        return {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+        }
+    return {}
+
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError):
     return JSONResponse(
         status_code=exc.status_code,
-        content={"error": {"code": exc.code, "message": exc.message}}
+        content={"error": {"code": exc.code, "message": exc.message}},
+        headers=get_cors_headers(request)
     )
 
 @app.exception_handler(HTTPException)
@@ -44,14 +54,16 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     
     return JSONResponse(
         status_code=exc.status_code,
-        content={"error": {"code": code, "message": str(exc.detail)}}
+        content={"error": {"code": code, "message": str(exc.detail)}},
+        headers=get_cors_headers(request)
     )
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=422,
-        content={"error": {"code": "VALIDATION_ERROR", "message": "Invalid request format or missing required fields."}}
+        content={"error": {"code": "VALIDATION_ERROR", "message": "Invalid request format or missing required fields."}},
+        headers=get_cors_headers(request)
     )
 
 @app.exception_handler(SQLAlchemyError)
@@ -60,7 +72,8 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     logger.error(f"DATABASE_ERROR request_id={req_id} path={request.url.path} error={str(exc)}")
     return JSONResponse(
         status_code=500,
-        content={"error": {"code": "DATABASE_ERROR", "message": "Unable to process your request right now. Please try again."}}
+        content={"error": {"code": "DATABASE_ERROR", "message": "Unable to process your request right now. Please try again."}},
+        headers=get_cors_headers(request)
     )
 
 @app.exception_handler(Exception)
@@ -69,7 +82,8 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"UNEXPECTED_ERROR request_id={req_id} path={request.url.path} error={str(exc)}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"error": {"code": "INTERNAL_ERROR", "message": "An unexpected error occurred. Please try again later."}}
+        content={"error": {"code": "INTERNAL_ERROR", "message": "An unexpected error occurred. Please try again later."}},
+        headers=get_cors_headers(request)
     )
 
 # Setup CORS

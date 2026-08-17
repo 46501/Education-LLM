@@ -11,23 +11,25 @@ async def test_global_exception_handler():
     pass
 
 @pytest.mark.asyncio
-async def test_unauthorized_access(client: AsyncClient):
-    response = await client.get("/api/v1/interviews")
+async def test_unauthorized_access(async_client: AsyncClient):
+    response = await async_client.get("/api/interviews")
     assert response.status_code == 401
     assert "detail" in response.json() or "error" in response.json()
 
 @pytest.mark.asyncio
-async def test_not_found(client: AsyncClient):
-    response = await client.get("/api/v1/non_existent_route_abc123")
+async def test_not_found(async_client: AsyncClient):
+    response = await async_client.get("/api/interviews/nonexistent-id")
     assert response.status_code == 404
+    data = response.json()
+    assert "error" in data or "detail" in data
 
 @pytest.mark.asyncio
-async def test_invalid_interview_setup(client: AsyncClient, token_headers):
+async def test_invalid_interview_setup(async_client: AsyncClient, token_headers):
     payload = {
         "interview_type": "TECHNICAL",
         # Missing role and other fields, should trigger validation error
     }
-    response = await client.post("/api/v1/interviews", json=payload, headers=token_headers)
+    response = await async_client.post("/api/interviews", json=payload, headers=token_headers)
     assert response.status_code == 422
     data = response.json()
     assert "detail" in data or "error" in data

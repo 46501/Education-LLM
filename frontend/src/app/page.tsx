@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch, APIError } from "../lib/api";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -12,24 +13,22 @@ export default function Home() {
     e.preventDefault();
     const endpoint = isLogin ? "/auth/login" : "/auth/register";
     try {
-      const res = await fetch(`http://localhost:8000${endpoint}`, {
+      const data = await apiFetch<any>(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        if (isLogin) {
-          localStorage.setItem("token", data.access_token);
-          router.push("/dashboard");
-        } else {
-          setIsLogin(true);
-        }
+      if (isLogin) {
+        localStorage.setItem("token", data.access_token);
+        router.push("/dashboard");
       } else {
-        alert(data.detail || "Error");
+        setIsLogin(true);
       }
-    } catch (err) {
-      alert("Network error");
+    } catch (err: any) {
+      if (err instanceof APIError) {
+        alert(err.message);
+      } else {
+        alert("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
