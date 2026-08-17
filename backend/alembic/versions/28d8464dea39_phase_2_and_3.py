@@ -21,8 +21,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Enable pgvector extension
-    op.execute('CREATE EXTENSION IF NOT EXISTS vector')
+    # Enable pgvector extension only for postgres
+    conn = op.get_bind()
+    if conn.dialect.name == "postgresql":
+        op.execute('CREATE EXTENSION IF NOT EXISTS vector')
 
     # Phase 2: Documents and Chunks
     op.create_table('documents',

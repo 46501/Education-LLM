@@ -110,3 +110,4 @@ app.include_router(flashcards_router, prefix="/api/flashcards", tags=["flashcard
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
