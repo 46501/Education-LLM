@@ -68,8 +68,14 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
 
   try {
     const data = await response.json();
+    if (data && data.error) {
+      throw new APIError(data.error.message || "An unexpected error occurred.", 500, data.error.code || "UNKNOWN_ERROR");
+    }
     return data;
   } catch (e) {
+    if (e instanceof APIError) {
+      throw e;
+    }
     throw new APIError("Failed to parse server response.", 500, "PARSE_ERROR");
   }
 }

@@ -71,8 +71,8 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     req_id = str(uuid.uuid4())
     logger.error(f"DATABASE_ERROR request_id={req_id} path={request.url.path} error={str(exc)}")
     return JSONResponse(
-        status_code=500,
-        content={"error": {"code": "DATABASE_ERROR", "message": "Unable to process your request right now. Please try again."}},
+        status_code=200,  # Return 200 to prevent browser console error, APIError handles it
+        content={"error": {"code": "DATABASE_ERROR", "message": "Database connection failed. Please ensure PostgreSQL is running."}},
         headers=get_cors_headers(request)
     )
 
@@ -80,8 +80,15 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
 async def global_exception_handler(request: Request, exc: Exception):
     req_id = str(uuid.uuid4())
     logger.error(f"UNEXPECTED_ERROR request_id={req_id} path={request.url.path} error={str(exc)}", exc_info=True)
+    # Check if it's a connection refused error
+    if isinstance(exc, (ConnectionError, OSError)) or "Connection refused" in str(exc) or "[WinError 1225]" in str(exc):
+        return JSONResponse(
+            status_code=200,
+            content={"error": {"code": "DATABASE_OFFLINE", "message": "Database connection failed. Please start Docker Desktop and run docker-compose up -d."}},
+            headers=get_cors_headers(request)
+        )
     return JSONResponse(
-        status_code=500,
+        status_code=200, # Return 200 to prevent browser console error
         content={"error": {"code": "INTERNAL_ERROR", "message": "An unexpected error occurred. Please try again later."}},
         headers=get_cors_headers(request)
     )
