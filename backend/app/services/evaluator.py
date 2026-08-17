@@ -1,4 +1,4 @@
-from litellm import acompletion
+from .llm import safe_acompletion
 import json
 from ..core.config import settings
 from ..prompts.answer_evaluation import ANSWER_EVALUATION_PROMPT, AnswerEvaluationResponse
@@ -45,7 +45,7 @@ class AnswerEvaluator:
         )
         
         try:
-            response = await acompletion(
+            response = await safe_acompletion(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 api_key=settings.LLM_API_KEY or "dummy",
@@ -64,7 +64,7 @@ class AnswerEvaluator:
             student_answer=student_answer
         )
         try:
-            response = await acompletion(
+            response = await safe_acompletion(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 api_key=settings.LLM_API_KEY or "dummy",

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -12,6 +12,7 @@ from ..models.learning import QuestionAttempt, TopicMastery, Mistake
 from ..schemas.exam import ExamCreate, ExamSessionResponse, ExamSubmitRequest, ExamResultResponse
 from ..services.exam_engine import exam_engine
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError, ValidationError, DatabaseError, ConflictError
 
 router = APIRouter()
 
@@ -77,7 +78,7 @@ async def get_exam(
     result = await db.execute(select(Exam).options(selectinload(Exam.topics)).where(Exam.id == exam_id, Exam.user_id == current_user.id))
     exam = result.scalars().first()
     if not exam:
-        raise HTTPException(status_code=404, detail="Exam not found")
+        raise ResourceNotFoundError("Exam not found")
         
     readiness = await exam_engine.calculate_readiness(db, current_user.id, exam.id)
     return {
@@ -111,7 +112,7 @@ async def start_exam_session(
     result = await db.execute(select(Exam).where(Exam.id == exam_id, Exam.user_id == current_user.id))
     exam = result.scalars().first()
     if not exam or exam.status != "ACTIVE":
-        raise HTTPException(status_code=400, detail="Exam not found or not active")
+        raise ValidationError("Exam not found or not active")
         
     session = ExamSession(
         exam_id=exam.id,
@@ -136,7 +137,7 @@ async def get_exam_session(
     )
     session = result.scalars().first()
     if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
+        raise ResourceNotFoundError("Session not found")
         
     questions = []
     for eq in sorted(session.exam.questions, key=lambda x: x.question_order):
@@ -173,7 +174,9 @@ async def submit_exam(
         session = await exam_engine.evaluate_exam(db, session_id, current_user.id, [a.model_dump() for a in submission.answers])
         return {"message": "Exam submitted successfully", "session_id": session.id}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise ValidationError(str(e))
+    except Exception:
+        raise DatabaseError("Failed to submit exam. Please try again.")
 
 @router.get("/{exam_id}/session/{session_id}/results")
 async def get_exam_results(
@@ -190,7 +193,7 @@ async def get_exam_results(
     )
     session = result.scalars().first()
     if not session or session.status != "SUBMITTED":
-        raise HTTPException(status_code=400, detail="Results not available")
+        raise ConflictError("Results not available")
         
     att_res = await db.execute(
         select(QuestionAttempt)

@@ -3,7 +3,7 @@ from sqlalchemy.future import select
 from ..models.personalization import StudyPlan, StudyPlanItem, RevisionSchedule, LearningMemory
 from ..models.learning import TopicMastery, Topic
 from typing import List, Dict, Optional
-import litellm
+from .llm import safe_acompletion
 from ..core.config import settings
 import json
 from datetime import datetime, timedelta, timezone
@@ -123,7 +123,7 @@ async def generate_study_plan_with_llm(
         return _generate_fallback_plan(context, goal, duration_days, available_minutes)
 
     try:
-        response = await litellm.acompletion(
+        response = await safe_acompletion(
             model="gemini/gemini-1.5-pro",
             api_key=settings.LLM_API_KEY,
             messages=[{"role": "user", "content": prompt}],

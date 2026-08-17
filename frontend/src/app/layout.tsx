@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,7 +33,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans transition-colors duration-300 dark:bg-gray-950 dark:text-gray-100 bg-gray-50 text-gray-900">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <DashboardLayout>{children}</DashboardLayout>
+          <ErrorBoundary>
+            <DashboardLayout>{children}</DashboardLayout>
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

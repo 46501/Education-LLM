@@ -1,4 +1,4 @@
-from litellm import acompletion
+from .llm import safe_acompletion
 import json
 from ..core.config import settings
 from ..prompts.quiz_generation import QUIZ_GENERATION_PROMPT, QuizGenerationResponse
@@ -50,16 +50,11 @@ class QuizGenerator:
             )
 
         try:
-            response = await acompletion(
+            response = await safe_acompletion(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
-                api_key=settings.LLM_API_KEY or "dummy",
-                response_format=QuizGenerationResponse,
-                timeout=60
+                response_format=QuizGenerationResponse
             )
-            # litellm with response_format=PydanticClass returns the pydantic object in response.choices[0].message.content as a JSON string
-            # wait, actually response_format=QuizGenerationResponse usually makes it return a json string that matches the schema, or if using Instructor it returns the object.
-            # In pure litellm, if we pass response_format, we need to parse the JSON string.
             content_str = response.choices[0].message.content
             parsed = QuizGenerationResponse.model_validate_json(content_str)
             return parsed

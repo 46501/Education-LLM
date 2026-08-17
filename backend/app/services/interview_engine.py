@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from ..models.interview import Interview, InterviewSession, InterviewMessage
 from ..prompts.interview_engine import INTERVIEW_TURN_PROMPT, INTERVIEW_COMPLETION_PROMPT
 from ..core.config import settings
-from litellm import acompletion
+from .llm import safe_acompletion
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class InterviewEngine:
                 }
                 next_q = "Mock next question based on your answer."
             else:
-                response = await acompletion(
+                response = await safe_acompletion(
                     model=self.model,
                     messages=[{"role": "system", "content": prompt}] + chat_history,
                     response_format={"type": "json_object"}
@@ -133,7 +133,7 @@ class InterviewEngine:
                     "recommended_practice": "Mock practice"
                 }
             else:
-                response = await acompletion(
+                response = await safe_acompletion(
                     model=self.model,
                     messages=[{"role": "system", "content": INTERVIEW_COMPLETION_PROMPT}] + chat_history,
                     response_format={"type": "json_object"}

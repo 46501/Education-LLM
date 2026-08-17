@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -11,6 +11,7 @@ from ..models.user import User
 from ..models.flashcard import FlashcardDeck, Flashcard
 from ..schemas.flashcard import FlashcardDeckCreate, FlashcardDeckOut, FlashcardCreate, FlashcardOut, FlashcardReviewSubmit
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError, ValidationError
 from ..services.gamification import award_xp
 
 router = APIRouter()
@@ -36,7 +37,7 @@ async def create_flashcard(deck_id: str, card_in: FlashcardCreate, db: AsyncSess
     result = await db.execute(select(FlashcardDeck).where(FlashcardDeck.id == deck_id, FlashcardDeck.user_id == current_user.id))
     deck = result.scalars().first()
     if not deck:
-        raise HTTPException(status_code=404, detail="Deck not found")
+        raise ResourceNotFoundError("Deck not found")
         
     card = Flashcard(deck_id=deck_id, front=card_in.front, back=card_in.back)
     db.add(card)
@@ -48,7 +49,7 @@ async def create_flashcard(deck_id: str, card_in: FlashcardCreate, db: AsyncSess
 async def get_cards_for_review(deck_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     result = await db.execute(select(FlashcardDeck).where(FlashcardDeck.id == deck_id, FlashcardDeck.user_id == current_user.id))
     if not result.scalars().first():
-        raise HTTPException(status_code=404, detail="Deck not found")
+        raise ResourceNotFoundError("Deck not found")
         
     now = datetime.now(timezone.utc)
     result = await db.execute(
@@ -66,12 +67,12 @@ async def review_flashcard(card_id: str, review_in: FlashcardReviewSubmit, db: A
     )
     card = result.scalars().first()
     if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
+        raise ResourceNotFoundError("Card not found")
         
     # SM-2 Algorithm
     quality = review_in.quality
     if quality < 0 or quality > 5:
-        raise HTTPException(status_code=400, detail="Quality must be between 0 and 5")
+        raise ValidationError("Quality must be between 0 and 5")
         
     if quality >= 3:
         if card.repetition == 0:

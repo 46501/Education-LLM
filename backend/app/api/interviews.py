@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -10,6 +10,7 @@ from ..models.interview import Interview, InterviewSession, InterviewMessage
 from ..schemas.interview import InterviewSetupRequest, InterviewAnswerRequest
 from ..services.interview_engine import interview_engine
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError, ValidationError, DatabaseError
 
 router = APIRouter()
 
@@ -49,7 +50,7 @@ async def start_interview(
     result = await db.execute(select(Interview).where(Interview.id == interview_id, Interview.user_id == current_user.id))
     interview = result.scalars().first()
     if not interview:
-        raise HTTPException(status_code=404, detail="Interview not found")
+        raise ResourceNotFoundError("Interview not found")
         
     session = InterviewSession(
         interview_id=interview.id,
@@ -80,8 +81,10 @@ async def answer_question(
     try:
         response = await interview_engine.process_answer(db, session_id, current_user.id, answer_data.answer)
         return response
+    except ValueError as ve:
+        raise ValidationError(str(ve))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise DatabaseError("Failed to process interview answer. Please try again.")
 
 @router.post("/session/{session_id}/complete")
 async def complete_interview(
@@ -104,5 +107,7 @@ async def complete_interview(
             "feedback": session.feedback,
             "gamification": gamification_result
         }
+    except ValueError as ve:
+        raise ValidationError(str(ve))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise DatabaseError("Failed to complete interview. Please try again.")

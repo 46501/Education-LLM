@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 from ..services.evaluator import answer_evaluator
 from ..services.scoring import scoring_engine
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError, ValidationError
 import uuid
 
 router = APIRouter()
@@ -110,7 +111,7 @@ async def get_quiz(quiz_id: str, current_user: User = Depends(get_current_user),
     )
     quiz = result.scalars().first()
     if not quiz:
-        raise HTTPException(status_code=404, detail="Quiz not found")
+        raise ResourceNotFoundError("Quiz not found")
     
     # Hide answers
     questions = []
@@ -139,7 +140,7 @@ async def submit_quiz(quiz_id: str, req: SubmitQuizRequest, current_user: User =
     )
     quiz = result.scalars().first()
     if not quiz or quiz.status == "COMPLETED":
-        raise HTTPException(status_code=400, detail="Quiz not found or already completed")
+        raise ValidationError("Quiz not found or already completed")
 
     # Map request answers
     answer_map = {ans.question_id: ans.submitted_answer for ans in req.answers}

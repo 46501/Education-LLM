@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi.responses import StreamingResponse
@@ -15,6 +15,7 @@ from ..models.user import User
 from ..models.chat import Conversation, Message
 from ..schemas.chat import MessageCreate, MessageResponse, ConversationResponse
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError
 
 router = APIRouter()
 
@@ -35,7 +36,7 @@ async def chat(request: MessageCreate, current_user: User = Depends(get_current_
         result = await db.execute(select(Conversation).where(Conversation.id == request.conversation_id, Conversation.user_id == current_user.id))
         conversation = result.scalars().first()
         if not conversation:
-            raise HTTPException(status_code=404, detail="Conversation not found")
+            raise ResourceNotFoundError("Conversation not found")
     else:
         conversation = Conversation(user_id=current_user.id, title=request.content[:50])
         db.add(conversation)
@@ -102,22 +103,28 @@ async def chat(request: MessageCreate, current_user: User = Depends(get_current_
             await db.commit()
             return
 
-        response = await acompletion(
-            model="gemini/gemini-1.5-pro", # Defaulting to gemini or openai based on settings
-            messages=messages,
-            api_key=settings.LLM_API_KEY or "dummy_key", # Assuming litellm will handle or we mock
-            stream=True
-        )
-        full_reply = ""
-        async for chunk in response:
-            if chunk.choices[0].delta.content:
-                content = chunk.choices[0].delta.content
-                full_reply += content
-                yield f"data: {json.dumps({'content': content})}\n\n"
-        
-        # Save AI reply
-        ai_message = Message(conversation_id=conversation.id, role="tutor", content=full_reply)
-        db.add(ai_message)
-        await db.commit()
+        try:
+            response = await acompletion(
+                model="gemini/gemini-1.5-pro",
+                messages=messages,
+                api_key=settings.LLM_API_KEY or "dummy_key",
+                stream=True
+            )
+            full_reply = ""
+            async for chunk in response:
+                if chunk.choices[0].delta.content:
+                    content = chunk.choices[0].delta.content
+                    full_reply += content
+                    yield f"data: {json.dumps({'content': content})}\n\n"
+            
+            ai_message = Message(conversation_id=conversation.id, role="tutor", content=full_reply)
+            db.add(ai_message)
+            await db.commit()
+        except Exception as e:
+            logger.error(f"Chat streaming error: {e}")
+            error_msg = "I'm having trouble connecting to my brain right now. Please try again."
+            yield f"data: {json.dumps({'content': error_msg, 'error': True})}\n\n"
+            # Attempt rollback for safety
+            await db.rollback()
 
     return StreamingResponse(generate(), media_type="text/event-stream")

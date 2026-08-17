@@ -1,4 +1,4 @@
-from litellm import aembedding
+from .llm import safe_aembedding
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import text
@@ -13,7 +13,7 @@ class RAGService:
         if not settings.LLM_API_KEY or settings.LLM_API_KEY == "your_openai_api_key_here":
             return [0.1] * 1536
             
-        response = await aembedding(
+        response = await safe_aembedding(
             model=self.embedding_model,
             input=content,
             api_key=settings.LLM_API_KEY or "dummy_key"

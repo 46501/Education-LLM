@@ -12,7 +12,7 @@ from ..models.personalization import LearningMemory
 from ..prompts.exam_generation import EXAM_GENERATION_PROMPT, ExamGenerationResponse
 from ..core.config import settings
 from .rag import rag_service
-from litellm import acompletion
+from .llm import safe_acompletion
 from .evaluator import answer_evaluator
 from .scoring import scoring_engine
 
@@ -111,7 +111,7 @@ class ExamEngine:
                             db.add(q)
                             new_questions_to_create.append((q, 1.0))
                     else:
-                        response = await acompletion(
+                        response = await safe_acompletion(
                             model=self.model,
                             messages=[{"role": "user", "content": prompt}],
                             response_format={"type": "json_object"}

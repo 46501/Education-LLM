@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from pydantic import BaseModel
@@ -13,6 +13,7 @@ from ..services.quiz_generator import quiz_generator
 from ..services.evaluator import answer_evaluator
 from ..services.scoring import scoring_engine
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError
 
 router = APIRouter()
 
@@ -79,7 +80,7 @@ async def answer_practice(req: PracticeAnswerRequest, current_user: User = Depen
     result = await db.execute(select(Question).where(Question.id == req.question_id))
     q = result.scalars().first()
     if not q:
-        raise HTTPException(status_code=404, detail="Question not found")
+        raise ResourceNotFoundError("Question not found")
 
     eval_res = answer_evaluator.evaluate_mcq(req.submitted_answer, q.correct_answer)
     

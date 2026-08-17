@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from passlib.context import CryptContext
@@ -9,6 +9,7 @@ from ..core.database import get_db
 from ..core.config import settings
 from ..models.user import User
 from ..schemas.auth import UserCreate, UserResponse, Token
+from ..core.exceptions import ConflictError, UnauthorizedError
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -30,7 +31,7 @@ def create_access_token(data: dict):
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == user.email))
     if result.scalars().first():
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise ConflictError("Email already registered")
     
     hashed_password = get_password_hash(user.password)
     new_user = User(email=user.email, password_hash=hashed_password)
@@ -44,11 +45,7 @@ async def login(user: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == user.email))
     db_user = result.scalars().first()
     if not db_user or not verify_password(user.password, db_user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedError("Incorrect email or password")
     
     access_token = create_access_token(data={"sub": db_user.id})
     return {"access_token": access_token, "token_type": "bearer"}

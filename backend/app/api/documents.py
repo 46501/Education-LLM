@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -8,6 +8,7 @@ from ..models.document import Document
 from ..services.document_parser import document_parser
 from ..services.rag import rag_service
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError, ValidationError, DatabaseError
 from pydantic import BaseModel
 from typing import List
 
@@ -32,10 +33,10 @@ async def upload_document(
         content = await file.read()
         chunks = document_parser.parse_and_chunk(content, file.content_type)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to process document: {str(e)}")
+        raise ValidationError("Failed to process document. It may be corrupted or unsupported.")
     
     if not chunks:
-        raise HTTPException(status_code=400, detail="No extractable text found in document")
+        raise ValidationError("No extractable text found in document")
 
     # Create document record
     document = Document(
@@ -54,7 +55,7 @@ async def upload_document(
         # Rollback
         await db.delete(document)
         await db.commit()
-        raise HTTPException(status_code=500, detail=f"Failed to generate embeddings: {str(e)}")
+        raise DatabaseError("Failed to process document embeddings. Please try again.")
 
     return document
 
@@ -76,7 +77,7 @@ async def delete_document(
     result = await db.execute(select(Document).where(Document.id == document_id, Document.user_id == current_user.id))
     document = result.scalars().first()
     if not document:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise ResourceNotFoundError("Document not found")
     
     await db.delete(document)
     await db.commit()

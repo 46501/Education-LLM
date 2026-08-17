@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -6,6 +6,7 @@ from typing import List
 
 from ..core.database import get_db
 from .deps import get_current_user
+from ..core.exceptions import ResourceNotFoundError, DatabaseError
 from ..models.user import User
 from ..models.personalization import (
     LearningProfile, LearningPreference, LearningMemory,
@@ -137,7 +138,7 @@ async def generate_study_plan(
         request.duration_days, request.available_minutes_per_day
     )
     if not plan_data:
-        raise HTTPException(status_code=500, detail="Failed to generate study plan")
+        raise DatabaseError("Failed to generate study plan")
 
     plan = await create_study_plan_from_data(
         db, current_user.id, plan_data,
@@ -262,7 +263,7 @@ async def complete_study_session(
     session = result.scalar_one_or_none()
 
     if not session:
-        raise HTTPException(status_code=404, detail="Study session not found")
+        raise ResourceNotFoundError("Study session not found")
 
     from datetime import datetime, timezone
     session.duration = session_data.duration
