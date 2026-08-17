@@ -111,7 +111,7 @@ function ExamSessionContent() {
     }
   };
 
-  if (!session) return <div className="p-12 text-center text-gray-500">Loading Exam...</div>;
+  if (!session) return <div className="p-12 text-center text-muted">Loading Exam...</div>;
 
   const currentQuestion = session.questions[currentIndex];
   const formatTime = (secs: number) => {
@@ -123,22 +123,22 @@ function ExamSessionContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Sticky Top Bar */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+      <div className="bg-surface border-b border-border sticky top-0 z-20 shadow-sm">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg font-mono font-medium border border-blue-100">
+            <div className="flex items-center gap-2 text-primary bg-primary-light/10 px-3 py-1.5 rounded-lg font-mono font-medium border border-primary/20">
               <Clock size={18} />
               {formatTime(timeLeft)}
             </div>
-            <span className="text-gray-500 text-sm font-medium">Remaining</span>
+            <span className="text-muted text-sm font-medium">Remaining</span>
           </div>
           
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition shadow-sm disabled:opacity-50"
+            className="flex items-center gap-2 bg-success text-white px-5 py-2 rounded-lg font-medium hover:bg-success/90 transition shadow-sm disabled:opacity-50"
           >
             <CheckCircle size={18} /> {submitting ? "Submitting..." : "Submit Exam"}
           </button>
@@ -154,10 +154,10 @@ function ExamSessionContent() {
               onClick={() => setCurrentIndex(idx)}
               className={`shrink-0 w-10 h-10 rounded-full font-medium border-2 transition flex items-center justify-center ${
                 currentIndex === idx 
-                  ? "border-blue-600 text-blue-600 bg-blue-50" 
+                  ? "border-primary text-primary bg-primary-light/10" 
                   : answers[q.question_id]
-                  ? "border-green-500 text-green-600 bg-green-50"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300"
+                  ? "border-success text-success bg-success/20"
+                  : "border-border text-muted hover:border-muted"
               }`}
             >
               {idx + 1}
@@ -165,28 +165,28 @@ function ExamSessionContent() {
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 min-h-[400px] flex flex-col">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-8 min-h-[400px] flex flex-col">
           <div className="flex justify-between items-start mb-6">
-            <span className="text-sm font-bold text-gray-400 uppercase tracking-wider">Question {currentIndex + 1} of {session.questions.length}</span>
-            <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">{currentQuestion.marks} Marks</span>
+            <span className="text-sm font-bold text-muted uppercase tracking-wider">Question {currentIndex + 1} of {session.questions.length}</span>
+            <span className="text-sm font-medium text-primary bg-primary-light/10 px-2 py-1 rounded">{currentQuestion.marks} Marks</span>
           </div>
 
-          <h2 className="text-xl font-medium text-gray-900 mb-8">{currentQuestion.question_text}</h2>
+          <h2 className="text-xl font-medium text-foreground mb-8">{currentQuestion.question_text}</h2>
 
           <div className="flex-1">
             {currentQuestion.question_type === "MULTIPLE_CHOICE" && currentQuestion.options ? (
               <div className="space-y-3">
                 {currentQuestion.options.map((opt, i) => (
-                  <label key={i} className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition ${answers[currentQuestion.question_id] === opt ? "border-blue-500 bg-blue-50" : "border-gray-100 hover:border-gray-200"}`}>
+                  <label key={i} className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition ${answers[currentQuestion.question_id] === opt ? "border-primary bg-primary-light/10" : "border-border hover:border-muted"}`}>
                     <input
                       type="radio"
                       name={currentQuestion.question_id}
                       value={opt}
                       checked={answers[currentQuestion.question_id] === opt}
                       onChange={() => handleAnswerChange(opt)}
-                      className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      className="w-5 h-5 text-primary border-border focus:ring-primary"
                     />
-                    <span className="text-gray-800">{opt}</span>
+                    <span className="text-foreground">{opt}</span>
                   </label>
                 ))}
               </div>
@@ -195,7 +195,7 @@ function ExamSessionContent() {
                 value={answers[currentQuestion.question_id] || ""}
                 onChange={(e) => handleAnswerChange(e.target.value)}
                 placeholder="Write your answer here..."
-                className="w-full h-64 p-4 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:ring-0 outline-none resize-none transition"
+                className="w-full h-64 p-4 rounded-xl border-2 bg-background border-border focus:border-primary focus:ring-0 outline-none resize-none transition text-foreground"
               />
             )}
           </div>
@@ -206,7 +206,7 @@ function ExamSessionContent() {
           <button
             onClick={() => setCurrentIndex(c => Math.max(0, c - 1))}
             disabled={currentIndex === 0}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-foreground bg-surface border border-border hover:bg-surface-hover transition disabled:opacity-50"
           >
             <ChevronLeft size={20} /> Previous
           </button>
@@ -214,7 +214,7 @@ function ExamSessionContent() {
           {currentIndex < session.questions.length - 1 ? (
             <button
               onClick={() => setCurrentIndex(c => Math.min(session.questions.length - 1, c + 1))}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 transition"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-primary hover:bg-primary-hover transition"
             >
               Next <ChevronRight size={20} />
             </button>
@@ -222,7 +222,7 @@ function ExamSessionContent() {
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-green-600 hover:bg-green-700 transition"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white bg-success hover:bg-success/90 transition"
             >
               Submit <CheckCircle size={20} />
             </button>
@@ -235,7 +235,7 @@ function ExamSessionContent() {
 
 export default function ExamSessionPage() {
   return (
-    <Suspense fallback={<div className="p-12 text-center text-gray-500">Loading...</div>}>
+    <Suspense fallback={<div className="p-12 text-center text-muted">Loading...</div>}>
       <ExamSessionContent />
     </Suspense>
   );

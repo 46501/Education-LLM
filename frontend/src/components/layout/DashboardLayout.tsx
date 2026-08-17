@@ -23,11 +23,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 z-20 bg-gray-900/50 lg:hidden"
+          className="fixed inset-0 z-20 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

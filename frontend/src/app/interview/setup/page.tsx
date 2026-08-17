@@ -57,16 +57,16 @@ export default function InterviewSetup() {
 
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center animate-in">
-      <div className="w-full max-w-2xl bg-white rounded-3xl border border-gray-100 overflow-hidden premium-shadow">
+      <div className="w-full max-w-2xl bg-surface rounded-3xl border border-border overflow-hidden premium-shadow">
         
-        <div className="bg-gradient-to-r from-purple-900 to-indigo-900 px-8 py-10 text-white flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-primary-dark to-primary px-8 py-10 text-white flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
           <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20 z-10 backdrop-blur-sm">
             <Mic size={32} className="text-white" />
           </div>
           <div className="text-center md:text-left z-10">
             <h1 className="text-2xl font-bold tracking-tight">Mock Interview Setup</h1>
-            <p className="text-purple-200 mt-1">Configure your AI interviewer for a realistic session.</p>
+            <p className="text-primary-light mt-1">Configure your AI interviewer for a realistic session.</p>
           </div>
         </div>
 
@@ -74,34 +74,34 @@ export default function InterviewSetup() {
           <div className="space-y-6">
             
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Target Role</label>
+              <label className="block text-sm font-semibold text-foreground/80 mb-1.5">Target Role</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Briefcase className="h-5 w-5 text-gray-400" />
+                  <Briefcase className="h-5 w-5 text-muted" />
                 </div>
                 <input
                   type="text"
                   required
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="pl-11 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
+                  className="pl-11 w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary focus:bg-surface outline-none transition-all text-foreground"
                   placeholder="e.g. Frontend Developer"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Topics (comma separated)</label>
+              <label className="block text-sm font-semibold text-foreground/80 mb-1.5">Topics (comma separated)</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Layers className="h-5 w-5 text-gray-400" />
+                  <Layers className="h-5 w-5 text-muted" />
                 </div>
                 <input
                   type="text"
                   required
                   value={formData.topics}
                   onChange={(e) => setFormData({ ...formData, topics: e.target.value })}
-                  className="pl-11 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
+                  className="pl-11 w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary focus:bg-surface outline-none transition-all text-foreground"
                   placeholder="e.g. React, System Design, JavaScript"
                 />
               </div>
@@ -109,11 +109,11 @@ export default function InterviewSetup() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Experience Level</label>
+                <label className="block text-sm font-semibold text-foreground/80 mb-1.5">Experience Level</label>
                 <select
                   value={formData.experience_level}
                   onChange={(e) => setFormData({ ...formData, experience_level: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all appearance-none"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary focus:bg-surface outline-none transition-all appearance-none text-foreground"
                 >
                   <option value="INTERN">Intern</option>
                   <option value="ENTRY">Entry Level</option>
@@ -123,7 +123,7 @@ export default function InterviewSetup() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Number of Questions</label>
+                <label className="block text-sm font-semibold text-foreground/80 mb-1.5">Number of Questions</label>
                 <input
                   type="number"
                   required
@@ -131,7 +131,7 @@ export default function InterviewSetup() {
                   max={15}
                   value={formData.num_questions}
                   onChange={(e) => setFormData({ ...formData, num_questions: parseInt(e.target.value) })}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white outline-none transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary focus:bg-surface outline-none transition-all text-foreground"
                 />
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function InterviewSetup() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

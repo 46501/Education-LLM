@@ -182,16 +182,16 @@ function InterviewSessionContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+    <div className="min-h-screen bg-background flex flex-col">
+      <header className="bg-surface shadow-sm border-b border-border sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <BrainCircuit className="text-purple-600" /> AI Interviewer
+          <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+            <BrainCircuit className="text-primary" /> AI Interviewer
           </h1>
           {!isCompleted && (
             <button
               onClick={handleComplete}
-              className="text-sm bg-gray-100 text-gray-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
+              className="text-sm bg-muted-bg text-muted px-4 py-2 rounded-lg font-medium hover:bg-surface-hover transition"
             >
               End Interview
             </button>
@@ -201,13 +201,13 @@ function InterviewSessionContent() {
 
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 overflow-y-auto">
         {isCompleted && finalScore !== null && (
-          <div className="mb-8 bg-purple-50 border border-purple-100 rounded-xl p-6 text-center">
-            <h2 className="text-2xl font-bold text-purple-900 mb-2">Interview Completed</h2>
-            <div className="text-5xl font-extrabold text-purple-600 my-4">{finalScore.toFixed(1)} <span className="text-2xl text-purple-400">/ 10</span></div>
-            <p className="text-purple-800">Your detailed feedback is saved to your profile.</p>
+          <div className="mb-8 bg-primary-light/10 border border-primary/20 rounded-xl p-6 text-center">
+            <h2 className="text-2xl font-bold text-foreground mb-2">Interview Completed</h2>
+            <div className="text-5xl font-extrabold text-primary my-4">{finalScore.toFixed(1)} <span className="text-2xl text-primary/70">/ 10</span></div>
+            <p className="text-muted">Your detailed feedback is saved to your profile.</p>
             <button
               onClick={() => router.push('/exams')}
-              className="mt-6 bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700 transition"
+              className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-hover transition"
             >
               Back to Dashboard
             </button>
@@ -219,8 +219,8 @@ function InterviewSessionContent() {
             <div key={idx} className={`flex ${msg.role === "student" ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl p-5 ${
                 msg.role === "student" 
-                  ? "bg-purple-600 text-white rounded-br-none shadow-md" 
-                  : "bg-white text-gray-800 border border-gray-100 shadow-sm rounded-bl-none"
+                  ? "bg-primary text-white rounded-br-none shadow-md" 
+                  : "bg-surface text-foreground border border-border shadow-sm rounded-bl-none"
               }`}>
                 <div className="flex items-center gap-2 mb-2 opacity-80 text-sm font-medium">
                   {msg.role === "student" ? <UserIcon size={16} /> : <Bot size={16} />}
@@ -229,12 +229,12 @@ function InterviewSessionContent() {
                 <div className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</div>
                 
                 {msg.evaluation && (
-                  <div className="mt-4 pt-3 border-t border-purple-400/30 text-sm bg-purple-700/30 p-3 rounded-lg">
-                    <div className="font-semibold text-purple-100 mb-1 flex items-center justify-between">
+                  <div className="mt-4 pt-3 border-t border-primary/30 text-sm bg-primary/20 p-3 rounded-lg">
+                    <div className="font-semibold text-white mb-1 flex items-center justify-between">
                       <span>Internal Evaluation</span>
-                      <span className="bg-purple-500 px-2 py-0.5 rounded text-xs">{msg.evaluation.score}/10</span>
+                      <span className="bg-primary-dark px-2 py-0.5 rounded text-xs">{msg.evaluation.score}/10</span>
                     </div>
-                    <p className="text-purple-50 italic">"{msg.evaluation.feedback}"</p>
+                    <p className="text-white/90 italic">"{msg.evaluation.feedback}"</p>
                   </div>
                 )}
               </div>
@@ -243,10 +243,10 @@ function InterviewSessionContent() {
           
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white border border-gray-100 shadow-sm rounded-2xl rounded-bl-none p-4 flex gap-2">
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"></span>
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+              <div className="bg-surface border border-border shadow-sm rounded-2xl rounded-bl-none p-4 flex gap-2">
+                <span className="w-2 h-2 bg-muted-bg rounded-full animate-bounce"></span>
+                <span className="w-2 h-2 bg-muted-bg rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                <span className="w-2 h-2 bg-muted-bg rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
               </div>
             </div>
           )}
@@ -255,7 +255,7 @@ function InterviewSessionContent() {
       </main>
 
       {!isCompleted && (
-        <div className="bg-white border-t border-gray-200 p-4 fixed bottom-0 w-full">
+        <div className="bg-surface border-t border-border p-4 fixed bottom-0 w-full">
           <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSend} className="flex items-center gap-3 relative">
               <input
@@ -264,7 +264,7 @@ function InterviewSessionContent() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={isListening ? "Listening..." : "Speak your answer..."}
                 disabled={isTyping}
-                className="w-full pl-5 pr-24 py-4 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-70"
+                className="w-full pl-5 pr-24 py-4 bg-background border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-70 text-foreground"
               />
               <div className="absolute right-2 flex items-center gap-1">
                 <button
@@ -272,8 +272,8 @@ function InterviewSessionContent() {
                   onClick={toggleListening}
                   className={`p-2.5 rounded-full transition-colors ${
                     isListening 
-                      ? "bg-red-100 text-red-600 hover:bg-red-200" 
-                      : "text-gray-400 hover:bg-gray-200"
+                      ? "bg-error-bg text-error hover:bg-error-bg/80" 
+                      : "text-muted hover:bg-muted-bg"
                   }`}
                 >
                   {isListening ? (
@@ -285,7 +285,7 @@ function InterviewSessionContent() {
                 <button
                   type="submit"
                   disabled={(!input.trim() && !isListening) || isTyping}
-                  className="p-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition disabled:opacity-50 disabled:hover:bg-purple-600"
+                  className="p-2.5 bg-primary text-white rounded-full hover:bg-primary-hover transition disabled:opacity-50 disabled:hover:bg-primary"
                 >
                   <Send size={20} className={isTyping ? "opacity-0" : ""} />
                 </button>
@@ -300,7 +300,7 @@ function InterviewSessionContent() {
 
 export default function InterviewSessionPage() {
   return (
-    <Suspense fallback={<div className="p-12 text-center text-gray-500">Loading...</div>}>
+    <Suspense fallback={<div className="p-12 text-center text-muted">Loading...</div>}>
       <InterviewSessionContent />
     </Suspense>
   );

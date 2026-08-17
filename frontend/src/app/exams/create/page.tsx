@@ -49,72 +49,72 @@ export default function CreateExam() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-12">
+    <div className="min-h-screen bg-background p-6 md:p-12">
       <div className="max-w-2xl mx-auto">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-8 transition-colors"
+          className="flex items-center gap-2 text-muted hover:text-foreground mb-8 transition-colors"
         >
           <ArrowLeft size={20} /> Back to Dashboard
         </button>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="bg-blue-600 px-8 py-6 text-white">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
+          <div className="bg-primary px-8 py-6 text-white">
             <h1 className="text-2xl font-bold">Create Exam Plan</h1>
-            <p className="text-blue-100 mt-1">Configure your goal and let AI build the syllabus</p>
+            <p className="text-primary-light mt-1">Configure your goal and let AI build the syllabus</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Exam Title</label>
+                <label className="block text-sm font-semibold text-foreground/80 mb-1">Exam Title</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <BookOpen className="h-5 w-5 text-gray-400" />
+                    <BookOpen className="h-5 w-5 text-muted" />
                   </div>
                   <input
                     type="text"
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="pl-10 w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    className="pl-10 w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-foreground"
                     placeholder="e.g. AWS Solutions Architect"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-semibold text-foreground/80 mb-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all h-24 resize-none"
+                  className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all h-24 resize-none text-foreground"
                   placeholder="Goals or specific areas to focus on..."
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Target Date</label>
+                  <label className="block text-sm font-semibold text-foreground/80 mb-1">Target Date</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Calendar className="h-5 w-5 text-gray-400" />
+                      <Calendar className="h-5 w-5 text-muted" />
                     </div>
                     <input
                       type="date"
                       required
                       value={formData.exam_date}
                       onChange={(e) => setFormData({ ...formData, exam_date: e.target.value })}
-                      className="pl-10 w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                      className="pl-10 w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-foreground"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Duration (mins)</label>
+                  <label className="block text-sm font-semibold text-foreground/80 mb-1">Duration (mins)</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Clock className="h-5 w-5 text-gray-400" />
+                      <Clock className="h-5 w-5 text-muted" />
                     </div>
                     <input
                       type="number"
@@ -122,25 +122,25 @@ export default function CreateExam() {
                       min={10}
                       value={formData.duration_minutes}
                       onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
-                      className="pl-10 w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                      className="pl-10 w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-foreground"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="pt-6 border-t border-gray-100 flex justify-end gap-3">
+            <div className="pt-6 border-t border-border flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-2 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+                className="px-6 py-2 border border-border text-foreground rounded-lg font-medium hover:bg-surface-hover transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {loading ? "Creating..." : "Create Exam Plan"}
               </button>

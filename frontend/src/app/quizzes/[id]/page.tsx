@@ -57,13 +57,13 @@ export default function TakeQuiz({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
-        <Loader2 size={40} className="text-indigo-600 animate-spin mb-4" />
-        <p className="text-gray-500 font-medium">Loading your quiz...</p>
+        <Loader2 size={40} className="text-primary animate-spin mb-4" />
+        <p className="text-muted font-medium">Loading your quiz...</p>
       </div>
     );
   }
   
-  if (!quiz) return <div className="p-8 text-center text-gray-500">Quiz not found.</div>;
+  if (!quiz) return <div className="p-8 text-center text-muted">Quiz not found.</div>;
 
   const answeredCount = Object.keys(answers).length;
   const totalQuestions = quiz.questions.length;
@@ -74,24 +74,24 @@ export default function TakeQuiz({ params }: { params: { id: string } }) {
     <div className="p-6 md:p-10 max-w-4xl mx-auto min-h-[calc(100vh-4rem)] animate-in">
       
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-[#f8fafc]/90 backdrop-blur-md pb-6 pt-2 mb-6">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 premium-shadow">
+      <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-md pb-6 pt-2 mb-6">
+        <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border flex flex-col md:flex-row md:items-center justify-between gap-6 premium-shadow">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{quiz.title}</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">{quiz.title}</h1>
             <div className="flex items-center gap-4 text-sm font-medium">
-              <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full">{quiz.subject}</span>
-              <span className="text-gray-500 flex items-center gap-1.5"><FileQuestion size={16} /> {totalQuestions} Questions</span>
+              <span className="bg-primary-light/30 text-primary px-3 py-1 rounded-full">{quiz.subject}</span>
+              <span className="text-muted flex items-center gap-1.5"><FileQuestion size={16} /> {totalQuestions} Questions</span>
             </div>
           </div>
           
           <div className="flex flex-col items-end gap-3 min-w-[200px]">
             <div className="w-full flex justify-between text-sm mb-1">
-              <span className="text-gray-500 font-medium">Progress</span>
-              <span className="font-bold text-indigo-600">{answeredCount} of {totalQuestions}</span>
+              <span className="text-muted font-medium">Progress</span>
+              <span className="font-bold text-primary">{answeredCount} of {totalQuestions}</span>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-2">
+            <div className="w-full bg-muted-bg rounded-full h-2">
               <div 
-                className="bg-indigo-600 h-2 rounded-full transition-all duration-500" 
+                className="bg-primary h-2 rounded-full transition-all duration-500" 
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
@@ -104,12 +104,12 @@ export default function TakeQuiz({ params }: { params: { id: string } }) {
         {quiz.questions.map((q: any, idx: number) => {
           const isAnswered = !!answers[q.id];
           return (
-            <div key={q.id} className={`bg-white p-6 md:p-8 rounded-2xl border transition-all ${isAnswered ? 'border-indigo-200' : 'border-gray-100'} premium-shadow-hover`}>
+            <div key={q.id} className={`bg-surface p-6 md:p-8 rounded-2xl border transition-all ${isAnswered ? 'border-primary/50' : 'border-border'} premium-shadow-hover`}>
               <div className="flex gap-4 mb-6">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${isAnswered ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${isAnswered ? 'bg-primary text-white' : 'bg-muted-bg text-muted'}`}>
                   {idx + 1}
                 </div>
-                <h3 className="text-lg font-medium text-gray-800 leading-relaxed pt-1">{q.text}</h3>
+                <h3 className="text-lg font-medium text-foreground leading-relaxed pt-1">{q.text}</h3>
               </div>
               
               <div className="pl-12">
@@ -122,8 +122,8 @@ export default function TakeQuiz({ params }: { params: { id: string } }) {
                           key={i} 
                           className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
                             isSelected 
-                              ? 'bg-indigo-50 border-indigo-500 ring-1 ring-indigo-500' 
-                              : 'bg-white border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                              ? 'bg-primary-light/20 border-primary ring-1 ring-primary' 
+                              : 'bg-surface border-border hover:border-primary-light hover:bg-surface-hover'
                           }`}
                         >
                           <input 
@@ -132,16 +132,16 @@ export default function TakeQuiz({ params }: { params: { id: string } }) {
                             value={opt} 
                             checked={isSelected}
                             onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
-                            className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                            className="w-5 h-5 text-primary border-border focus:ring-primary"
                           />
-                          <span className="font-medium text-gray-700">{opt}</span>
+                          <span className="font-medium text-foreground">{opt}</span>
                         </label>
                       );
                     })}
                   </div>
                 ) : (
                   <textarea 
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 focus:bg-white transition-all resize-y min-h-[120px]"
+                    className="w-full p-4 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-background focus:bg-surface transition-all resize-y min-h-[120px] text-foreground"
                     placeholder="Type your detailed answer here..."
                     value={answers[q.id] || ""}
                     onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
@@ -159,8 +159,8 @@ export default function TakeQuiz({ params }: { params: { id: string } }) {
           disabled={submitting} 
           className={`px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-sm ${
             isComplete 
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-              : 'bg-gray-800 hover:bg-gray-900 text-white'
+              ? 'bg-success hover:bg-success/90 text-white' 
+              : 'bg-muted hover:bg-muted/80 text-white'
           } disabled:opacity-50`}
         >
           {submitting ? (

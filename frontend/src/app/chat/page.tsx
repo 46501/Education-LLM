@@ -156,18 +156,18 @@ export default function Chat() {
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center max-w-lg mx-auto pb-20">
-            <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
+            <div className="w-16 h-16 bg-primary-light/30 text-primary rounded-2xl flex items-center justify-center mb-6">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a2 2 0 0 1 2 2c-.11.66-.54 1.25-1.16 1.58A3.01 3.01 0 0 0 11 8.5c0 1.25.79 2.36 1.95 2.82A2 2 0 0 1 14 13h0a2 2 0 0 1-2 2c-.11.66-.54 1.25-1.16 1.58A3.01 3.01 0 0 0 11 19.5c0 1.25.79 2.36 1.95 2.82A2 2 0 0 1 14 24"></path><path d="M10 2a2 2 0 0 0-2 2c.11.66.54 1.25 1.16 1.58A3.01 3.01 0 0 1 11 8.5c0 1.25-.79 2.36-1.95 2.82A2 2 0 0 0 8 13h0a2 2 0 0 0 2 2c.11.66.54 1.25 1.16 1.58A3.01 3.01 0 0 1 11 19.5c0 1.25-.79 2.36-1.95 2.82A2 2 0 0 0 8 24"></path></svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">How can I help you learn today?</h2>
-            <p className="text-gray-500 mb-8">Ask a question, request a summary, or have me explain a difficult concept from your study materials.</p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">How can I help you learn today?</h2>
+            <p className="text-muted mb-8">Ask a question, request a summary, or have me explain a difficult concept from your study materials.</p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               {["Explain quantum physics simply", "Quiz me on Python basics", "Summarize my uploaded notes", "Give me a coding example"].map((suggestion) => (
                 <button 
                   key={suggestion}
                   onClick={() => setInput(suggestion)}
-                  className="bg-white border border-gray-200 p-3 rounded-xl text-sm text-gray-600 hover:border-indigo-300 hover:text-indigo-700 transition text-left"
+                  className="bg-surface border border-border p-3 rounded-xl text-sm text-foreground/80 hover:border-primary/50 hover:text-primary hover:bg-surface-hover transition text-left"
                 >
                   {suggestion}
                 </button>
@@ -180,8 +180,8 @@ export default function Chat() {
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] md:max-w-2xl p-4 rounded-2xl shadow-sm leading-relaxed ${
               msg.role === 'user' 
-                ? 'bg-indigo-600 text-white rounded-br-none' 
-                : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
+                ? 'bg-primary text-white rounded-br-none' 
+                : 'bg-surface text-foreground border border-border rounded-bl-none'
             }`}>
               <div className="whitespace-pre-wrap text-[15px]">{msg.content}</div>
             </div>
@@ -190,10 +190,10 @@ export default function Chat() {
         
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-white p-4 rounded-2xl rounded-bl-none border border-gray-100 shadow-sm flex gap-1.5 items-center">
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+            <div className="bg-surface p-4 rounded-2xl rounded-bl-none border border-border shadow-sm flex gap-1.5 items-center">
+              <span className="w-2 h-2 bg-muted-bg rounded-full animate-bounce"></span>
+              <span className="w-2 h-2 bg-muted-bg rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+              <span className="w-2 h-2 bg-muted-bg rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
             </div>
           </div>
         )}
@@ -201,7 +201,7 @@ export default function Chat() {
       </div>
 
       <div className="p-4 bg-transparent border-t-0 mb-4 shrink-0">
-        <form onSubmit={handleSend} className="relative max-w-3xl mx-auto shadow-sm rounded-2xl bg-white border border-gray-200 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all">
+        <form onSubmit={handleSend} className="relative max-w-3xl mx-auto shadow-sm rounded-2xl bg-surface border border-border overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -212,7 +212,7 @@ export default function Chat() {
               }
             }}
             placeholder={isListening ? "Listening..." : "Message AI Tutor..."}
-            className="w-full max-h-32 min-h-[56px] p-4 pr-24 resize-none focus:outline-none text-gray-800 dark:text-gray-100 bg-transparent"
+            className="w-full max-h-32 min-h-[56px] p-4 pr-24 resize-none focus:outline-none text-foreground bg-transparent"
             rows={1}
           />
           <div className="absolute right-2 bottom-2 flex items-center gap-1">
@@ -221,8 +221,8 @@ export default function Chat() {
               onClick={toggleListening}
               className={`p-2.5 rounded-lg transition-colors ${
                 isListening 
-                  ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" 
-                  : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "bg-error-bg text-error hover:bg-error-bg/80" 
+                  : "text-muted hover:bg-muted-bg"
               }`}
             >
               {isListening ? (
@@ -234,13 +234,13 @@ export default function Chat() {
             <button
               type="submit"
               disabled={isTyping || (!input.trim() && !isListening)}
-              className="p-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 transition"
+              className="p-2.5 bg-primary text-white rounded-lg hover:bg-primary-hover disabled:opacity-50 disabled:hover:bg-primary transition"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
           </div>
         </form>
-        <p className="text-center text-xs text-gray-400 mt-3">AI Tutor can make mistakes. Verify important information.</p>
+        <p className="text-center text-xs text-muted mt-3">AI Tutor can make mistakes. Verify important information.</p>
       </div>
     </div>
   );

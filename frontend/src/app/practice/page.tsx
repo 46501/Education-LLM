@@ -62,28 +62,28 @@ export default function PracticeMode() {
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto flex flex-col h-full min-h-[calc(100vh-4rem)]">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Target className="text-indigo-600" /> Practice Mode
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <Target className="text-primary" /> Practice Mode
         </h1>
-        <p className="text-gray-500 mt-1">Hone your skills with adaptive difficulty questions.</p>
+        <p className="text-muted mt-1">Hone your skills with adaptive difficulty questions.</p>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center">
         {!activeQuestion ? (
-          <div className="w-full max-w-lg bg-white p-8 rounded-2xl border border-gray-100 premium-shadow">
-            <h2 className="text-lg font-bold mb-6 text-gray-900 border-b border-gray-100 pb-4 flex items-center gap-2">
-              <Settings2 size={18} className="text-gray-400" /> Configure Session
+          <div className="w-full max-w-lg bg-surface p-8 rounded-2xl border border-border premium-shadow">
+            <h2 className="text-lg font-bold mb-6 text-foreground border-b border-border pb-4 flex items-center gap-2">
+              <Settings2 size={18} className="text-muted" /> Configure Session
             </h2>
             <form onSubmit={handleStart} className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Subject</label>
+                <label className="block text-sm font-semibold text-foreground/80 mb-1">Subject</label>
                 <div className="relative">
-                  <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                  <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
                   <input 
                     required 
                     type="text" 
                     placeholder="e.g. Computer Science"
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" 
+                    className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground" 
                     value={subject} 
                     onChange={e => setSubject(e.target.value)} 
                   />
@@ -91,14 +91,14 @@ export default function PracticeMode() {
               </div>
               
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Topic</label>
+                <label className="block text-sm font-semibold text-foreground/80 mb-1">Topic</label>
                 <div className="relative">
-                  <Target className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                  <Target className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
                   <input 
                     required 
                     type="text" 
                     placeholder="e.g. Algorithms"
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" 
+                    className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground" 
                     value={topic} 
                     onChange={e => setTopic(e.target.value)} 
                   />
@@ -106,9 +106,9 @@ export default function PracticeMode() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Starting Difficulty</label>
+                <label className="block text-sm font-semibold text-foreground/80 mb-1">Starting Difficulty</label>
                 <select 
-                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" 
+                  className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground" 
                   value={difficulty} 
                   onChange={e => setDifficulty(e.target.value)}
                 >
@@ -123,7 +123,7 @@ export default function PracticeMode() {
               <button 
                 type="submit" 
                 disabled={loading} 
-                className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition shadow-sm mt-4 disabled:opacity-70"
+                className="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-hover transition shadow-sm mt-4 disabled:opacity-70"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -136,34 +136,34 @@ export default function PracticeMode() {
             </form>
           </div>
         ) : (
-          <div className="w-full bg-white p-8 rounded-2xl border border-gray-100 premium-shadow">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">{topic}</h2>
+          <div className="w-full bg-surface p-8 rounded-2xl border border-border premium-shadow">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-border">
+              <h2 className="text-lg font-bold text-foreground">{topic}</h2>
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                difficulty === 'BEGINNER' || difficulty === 'EASY' ? 'bg-emerald-100 text-emerald-800' :
-                difficulty === 'MEDIUM' ? 'bg-amber-100 text-amber-800' :
-                'bg-red-100 text-red-800'
+                difficulty === 'BEGINNER' || difficulty === 'EASY' ? 'bg-success/20 text-success' :
+                difficulty === 'MEDIUM' ? 'bg-warning/20 text-warning' :
+                'bg-error/20 text-error'
               }`}>
                 {difficulty}
               </span>
             </div>
 
-            <h3 className="text-xl font-medium text-gray-800 mb-8 leading-relaxed">{activeQuestion.text}</h3>
+            <h3 className="text-xl font-medium text-foreground mb-8 leading-relaxed">{activeQuestion.text}</h3>
             
             <div className="space-y-3 mb-8">
               {activeQuestion.options?.map((opt: string, i: number) => {
                 const isSelected = answer === opt;
-                let bgState = "bg-white border-gray-200 hover:border-indigo-300 hover:bg-gray-50";
-                if (isSelected) bgState = "bg-indigo-50 border-indigo-500 ring-1 ring-indigo-500";
+                let bgState = "bg-surface border-border hover:border-primary-light hover:bg-surface-hover text-foreground";
+                if (isSelected) bgState = "bg-primary-light/20 border-primary ring-1 ring-primary text-foreground";
                 
                 // If feedback exists, show correct/incorrect styling on the options
                 if (feedback) {
                   if (opt === feedback.correct_answer) {
-                    bgState = "bg-emerald-50 border-emerald-500 text-emerald-900";
+                    bgState = "bg-success-bg border-success text-success";
                   } else if (isSelected && !feedback.is_correct) {
-                    bgState = "bg-red-50 border-red-500 text-red-900";
+                    bgState = "bg-error-bg border-error text-error";
                   } else {
-                    bgState = "bg-gray-50 border-gray-200 opacity-50";
+                    bgState = "bg-muted-bg border-border opacity-50 text-foreground";
                   }
                 }
 
@@ -175,12 +175,12 @@ export default function PracticeMode() {
                       value={opt} 
                       checked={isSelected} 
                       onChange={(e) => setAnswer(e.target.value)} 
-                      className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500" 
+                      className="w-5 h-5 text-primary border-border focus:ring-primary" 
                       disabled={!!feedback} 
                     />
                     <span className="font-medium">{opt}</span>
-                    {feedback && opt === feedback.correct_answer && <CheckCircle className="ml-auto text-emerald-500" size={20} />}
-                    {feedback && isSelected && !feedback.is_correct && <XCircle className="ml-auto text-red-500" size={20} />}
+                    {feedback && opt === feedback.correct_answer && <CheckCircle className="ml-auto text-success" size={20} />}
+                    {feedback && isSelected && !feedback.is_correct && <XCircle className="ml-auto text-error" size={20} />}
                   </label>
                 );
               })}
@@ -190,22 +190,22 @@ export default function PracticeMode() {
               <button 
                 onClick={handleAnswer} 
                 disabled={!answer || loading} 
-                className="w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 transition flex items-center justify-center gap-2"
+                className="w-full bg-foreground text-background py-3 rounded-lg font-medium hover:bg-foreground/90 disabled:opacity-50 transition flex items-center justify-center gap-2"
               >
                 {loading ? "Checking..." : "Submit Answer"}
               </button>
             ) : (
               <div className="animate-in">
-                <div className={`p-6 rounded-xl border mb-6 ${feedback.is_correct ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
-                  <h4 className={`text-lg font-bold flex items-center gap-2 mb-2 ${feedback.is_correct ? 'text-emerald-800' : 'text-red-800'}`}>
+                <div className={`p-6 rounded-xl border mb-6 ${feedback.is_correct ? 'bg-success-bg border-success/30' : 'bg-error-bg border-error/30'}`}>
+                  <h4 className={`text-lg font-bold flex items-center gap-2 mb-2 ${feedback.is_correct ? 'text-success' : 'text-error'}`}>
                     {feedback.is_correct ? <><CheckCircle /> Correct!</> : <><XCircle /> Incorrect</>}
                   </h4>
-                  {feedback.explanation && <p className="text-gray-700 leading-relaxed mt-2">{feedback.explanation}</p>}
+                  {feedback.explanation && <p className="text-foreground leading-relaxed mt-2">{feedback.explanation}</p>}
                 </div>
                 
                 <button 
                   onClick={() => fetchNextQuestion(feedback.new_recommended_difficulty)} 
-                  className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition flex items-center justify-center gap-2"
+                  className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-hover transition flex items-center justify-center gap-2"
                 >
                   Next Question <ArrowRight size={18} />
                 </button>
